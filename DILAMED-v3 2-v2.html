@@ -1,0 +1,1848 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>DILAMED — Kıyafet Takip</title>
+
+<!-- ── PWA / Ana Ekrana Ekle ── -->
+<meta name="application-name" content="DILAMED">
+<!-- iOS / iPadOS standalone (tam ekran, adres çubuğu gizli) -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DILAMED">
+<!-- Android / Chrome standalone -->
+<meta name="mobile-web-app-capable" content="yes">
+<!-- Tema rengi (Android Chrome adres çubuğu / iOS status bar) -->
+<meta name="theme-color" content="#C9A96E">
+<meta name="msapplication-TileColor" content="#FAF7F2">
+<meta name="msapplication-tap-highlight" content="no">
+<!-- Viewport: safe-area için cover -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<!-- Manifest inline (PWA standalone — display:standalone adres çubuğunu gizler) -->
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22DILAMED%20K%C4%B1yafet%20Y%C3%B6netim%22%2C%22short_name%22%3A%22DILAMED%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22orientation%22%3A%22portrait%22%2C%22background_color%22%3A%22%23FAF7F2%22%2C%22theme_color%22%3A%22%23C9A96E%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%2520viewBox%3D%270%200%20512%20512%27%253E%253Crect%2520width%3D%27512%27%2520height%3D%27512%27%2520rx%3D%27100%27%2520fill%3D%27%23C9A96E%27%2F%253E%253Ctext%2520x%3D%27256%27%2520y%3D%27310%27%2520text-anchor%3D%27middle%27%2520font-family%3D%27serif%27%2520font-size%3D%27180%27%2520font-weight%3D%27bold%27%2520fill%3D%27white%27%253ED%253C%2Ftext%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #FAF7F2;
+  --champagne: #F0E8DC;
+  --gold: #C9A96E;
+  --gold-dark: #8B6F47;
+  --gold-light: #E8D5B5;
+  --rose: #D4A5A5;
+  --rose-light: #F5E8E8;
+  --rose-dark: #B88080;
+  --lilac: #C8B8D8;
+  --lilac-light: #F0EAF8;
+  --lilac-dark: #8A6FA0;
+  --teal: #A8C8C0;
+  --teal-light: #E8F5F2;
+  --teal-dark: #4A8E84;
+  --text-dark: #2C2822;
+  --text-mid: #6B5E52;
+  --text-light: #A89888;
+  --white: #FFFFFF;
+  --border: #E8DDD0;
+  --success: #7BAE9C;
+  --warning: #C9A96E;
+  --danger: #C97A7A;
+  --shadow-sm: 0 2px 8px rgba(44,40,34,0.06);
+  --shadow-md: 0 4px 20px rgba(44,40,34,0.10);
+  --shadow-lg: 0 8px 40px rgba(44,40,34,0.14);
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--cream);
+  color: var(--text-dark);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  position: fixed; left: 0; top: 0; bottom: 0; width: 240px;
+  background: var(--white);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  z-index: 100;
+  transition: transform .3s ease;
+}
+.sidebar-logo {
+  padding: 24px 24px 18px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-logo h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 26px; font-weight: 600; letter-spacing: 3px;
+  background: linear-gradient(135deg, #C9A96E, #8B6F47, #E8C97A, #C9A96E);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.sidebar-logo h1 span { -webkit-text-fill-color: inherit; }
+.sidebar-logo p { font-size: 10px; color: var(--text-light); letter-spacing: 2px; text-transform: uppercase; margin-top: 3px; }
+
+.sidebar-nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
+.nav-label { font-size: 10px; color: var(--text-light); text-transform: uppercase; letter-spacing: 2px; padding: 12px 12px 6px; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: var(--radius-sm);
+  cursor: pointer; font-size: 14px; color: var(--text-mid);
+  transition: all .2s; margin-bottom: 2px;
+  border: none; background: none; width: 100%; text-align: left;
+}
+.nav-item:hover { background: var(--champagne); color: var(--text-dark); }
+.nav-item.active { background: linear-gradient(135deg, var(--gold-light), var(--champagne)); color: var(--gold-dark); font-weight: 500; }
+.nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
+
+.sidebar-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  font-size: 11px; color: var(--text-light); text-align: center;
+}
+
+/* ── MAIN ── */
+.main { margin-left: 240px; min-height: 100vh; }
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(250,247,242,.92); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 64px;
+}
+.topbar-left { display: flex; align-items: center; gap: 12px; }
+.topbar-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 500; }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+.btn-icon {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--white); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 16px; transition: all .2s;
+  color: var(--text-mid);
+}
+.btn-icon:hover { border-color: var(--gold); color: var(--gold); }
+.content { padding: 32px; }
+
+/* ── BUTTONS ── */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 20px; border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  transition: all .2s; border: 1px solid transparent;
+  font-family: 'Inter', sans-serif;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  color: var(--white); border-color: var(--gold-dark);
+  box-shadow: 0 2px 8px rgba(201,169,110,.3);
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(201,169,110,.4); }
+.btn-secondary { background: var(--white); color: var(--text-mid); border-color: var(--border); }
+.btn-secondary:hover { border-color: var(--gold); color: var(--gold-dark); }
+.btn-rose { background: var(--rose-light); color: var(--rose-dark); border-color: var(--rose); }
+.btn-lilac { background: var(--lilac-light); color: var(--lilac-dark); border-color: var(--lilac); }
+.btn-teal { background: var(--teal-light); color: var(--teal-dark); border-color: var(--teal); }
+.btn-danger { background: #FFF0F0; color: var(--danger); border-color: #F0C0C0; }
+.btn-sm { padding: 6px 14px; font-size: 12px; }
+.btn-lg { padding: 14px 28px; font-size: 15px; }
+
+/* ── CATEGORY BADGES ── */
+.cat-badge-gelinlik { background: var(--rose-light); color: var(--rose-dark); border: 1px solid var(--rose); }
+.cat-badge-nisanlik { background: var(--lilac-light); color: var(--lilac-dark); border: 1px solid var(--lilac); }
+.cat-badge-kinalik   { background: var(--teal-light);  color: var(--teal-dark);  border: 1px solid var(--teal); }
+
+/* ── STAT CARDS ── */
+.stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 28px; }
+.stat-card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px 24px;
+  position: relative; overflow: hidden; transition: all .2s;
+}
+.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+.stat-card.total::before    { background: var(--gold); }
+.stat-card.rented::before   { background: var(--rose); }
+.stat-card.sold::before     { background: #A8C5B5; }
+.stat-card.available::before{ background: #B5C8A8; }
+.stat-icon { font-size: 28px; margin-bottom: 10px; }
+.stat-value { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 600; line-height: 1; color: var(--text-dark); }
+.stat-label { font-size: 12px; color: var(--text-light); margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
+.stat-sub { font-size: 11px; color: var(--text-light); margin-top: 8px; }
+
+/* ── SECTION HEADER ── */
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.section-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 500; }
+.section-title span { color: var(--gold); }
+
+/* ── UPCOMING TABLE ── */
+.upcoming-card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden; margin-bottom: 28px;
+  overflow-x: auto;
+}
+.upcoming-card table { width: 100%; border-collapse: collapse; min-width: 600px; }
+.upcoming-card th {
+  padding: 12px 16px; background: var(--champagne);
+  font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px;
+  color: var(--text-light); font-weight: 500; text-align: left;
+}
+.upcoming-card td { padding: 12px 16px; border-top: 1px solid var(--border); font-size: 13px; }
+.upcoming-card tr:hover td { background: var(--cream); }
+.badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+.badge-available { background: #E8F5F0; color: #4A9E82; }
+.badge-rented    { background: var(--rose-light); color: var(--rose-dark); }
+.badge-sold      { background: #F0EDE8; color: var(--text-light); }
+.badge-warning   { background: #FFF8EC; color: var(--gold-dark); }
+.badge-overdue   { background: #FFF0F0; color: var(--danger); }
+
+/* ── INVENTORY ── */
+.filters-bar {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  margin-bottom: 24px; background: var(--white);
+  border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px;
+}
+.search-box {
+  flex: 1; min-width: 180px;
+  display: flex; align-items: center; gap: 8px;
+  background: var(--cream); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 8px 14px;
+}
+.search-box input { border: none; background: none; outline: none; font-size: 13px; color: var(--text-dark); width: 100%; font-family: 'Inter', sans-serif; }
+.filter-select {
+  padding: 8px 14px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--cream);
+  font-size: 13px; color: var(--text-mid); outline: none;
+  font-family: 'Inter', sans-serif; cursor: pointer;
+}
+.filter-select:focus { border-color: var(--gold); }
+
+.dress-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+.dress-card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
+  transition: all .25s; cursor: pointer; position: relative;
+}
+.dress-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--gold-light); }
+.dress-photo {
+  height: 220px; background: var(--champagne);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; position: relative;
+}
+.dress-photo img { width: 100%; height: 100%; object-fit: cover; }
+.dress-photo-placeholder { display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--text-light); }
+.dress-photo-placeholder .ph-icon { font-size: 36px; }
+.dress-photo-placeholder span { font-size: 12px; }
+.dress-status-badge { position: absolute; top: 10px; right: 10px; }
+.dress-cat-badge { position: absolute; top: 10px; left: 10px; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 600; }
+.dress-info { padding: 16px; }
+.dress-code { font-size: 10px; color: var(--text-light); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
+.dress-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 500; margin-bottom: 6px; }
+.dress-meta { display: flex; align-items: center; justify-content: space-between; }
+.dress-style { font-size: 12px; color: var(--text-light); }
+.dress-price { font-size: 15px; font-weight: 600; color: var(--gold-dark); }
+
+/* ── DETAIL ── */
+.detail-back {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; color: var(--text-mid); cursor: pointer;
+  margin-bottom: 24px; width: fit-content;
+  padding: 8px 0; border: none; background: none; font-family: 'Inter', sans-serif;
+}
+.detail-back:hover { color: var(--gold-dark); }
+.detail-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+.detail-photo-area {
+  background: var(--champagne); border-radius: var(--radius);
+  min-height: 400px; display: flex; align-items: center; justify-content: center;
+  overflow: hidden; position: relative; border: 1px solid var(--border);
+}
+.detail-photo-area img { width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius); }
+.detail-photo-upload { display: flex; flex-direction: column; align-items: center; gap: 12px; color: var(--text-light); cursor: pointer; padding: 40px; }
+.upload-icon { font-size: 48px; }
+.upload-hint { font-size: 12px; color: var(--text-light); text-align: center; }
+input[type="file"] { display: none; }
+.detail-info { display: flex; flex-direction: column; gap: 20px; }
+.info-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+.info-card h3 {
+  font-family: 'Cormorant Garamond', serif; font-size: 16px; font-weight: 500;
+  color: var(--text-mid); margin-bottom: 14px;
+  padding-bottom: 10px; border-bottom: 1px solid var(--border);
+}
+.info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.info-row:last-child { margin-bottom: 0; }
+.info-key { font-size: 12px; color: var(--text-light); }
+.info-val { font-size: 14px; font-weight: 500; color: var(--text-dark); }
+.action-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(44,40,34,.4);
+  backdrop-filter: blur(4px); z-index: 200;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.modal {
+  background: var(--white); border-radius: var(--radius);
+  width: 100%; max-width: 560px; max-height: 92vh; overflow-y: auto;
+  box-shadow: var(--shadow-lg); animation: modalIn .25s ease;
+}
+@keyframes modalIn { from { opacity: 0; transform: scale(.96) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+.modal-header {
+  padding: 24px 28px 16px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; background: var(--white); z-index: 1;
+}
+.modal-header h2 { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 500; }
+.modal-close {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 1px solid var(--border); background: var(--cream);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 16px; color: var(--text-light); transition: all .2s;
+}
+.modal-close:hover { border-color: var(--danger); color: var(--danger); }
+.modal-body { padding: 24px 28px; }
+.modal-footer { padding: 16px 28px 24px; display: flex; gap: 10px; justify-content: flex-end; }
+
+.form-group { margin-bottom: 18px; }
+.form-label { display: block; font-size: 12px; color: var(--text-mid); font-weight: 500; margin-bottom: 6px; letter-spacing: .3px; }
+.form-input, .form-select, .form-textarea {
+  width: 100%; padding: 10px 14px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--cream); font-size: 13px; color: var(--text-dark);
+  outline: none; transition: border-color .2s; font-family: 'Inter', sans-serif;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--gold); background: var(--white); }
+.form-textarea { resize: vertical; min-height: 80px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-hint { font-size: 11px; color: var(--text-light); margin-top: 4px; }
+
+/* ── CATEGORY TABS (in modal) ── */
+.cat-tab-group { display: flex; gap: 6px; margin-bottom: 6px; }
+.cat-tab {
+  flex: 1; padding: 8px 10px; border-radius: var(--radius-sm);
+  border: 2px solid var(--border); background: var(--cream);
+  cursor: pointer; font-size: 12px; font-weight: 500;
+  text-align: center; transition: all .2s; font-family: 'Inter', sans-serif;
+  color: var(--text-mid);
+}
+.cat-tab:hover { border-color: var(--gold-light); }
+.cat-tab.sel-gelinlik { border-color: var(--rose); background: var(--rose-light); color: var(--rose-dark); }
+.cat-tab.sel-nisanlik { border-color: var(--lilac); background: var(--lilac-light); color: var(--lilac-dark); }
+.cat-tab.sel-kinalik  { border-color: var(--teal);  background: var(--teal-light);  color: var(--teal-dark); }
+
+/* ── CALENDAR ── */
+.calendar-wrapper { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; }
+.cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
+.cal-header-left { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; gap: 10px; }
+.cal-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 500; }
+.cal-nav { display: flex; gap: 8px; }
+.cal-btn {
+  padding: 6px 14px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--cream);
+  cursor: pointer; font-size: 13px; color: var(--text-mid);
+  transition: all .2s; font-family: 'Inter', sans-serif;
+}
+.cal-btn:hover { border-color: var(--gold); color: var(--gold-dark); }
+.cal-filter-select {
+  padding: 6px 12px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--cream);
+  font-size: 12px; color: var(--text-mid); outline: none;
+  font-family: 'Inter', sans-serif; cursor: pointer;
+}
+.cal-filter-select:focus { border-color: var(--gold); }
+.cal-grid-head { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; margin-bottom: 8px; }
+.cal-day-name { text-align: center; font-size: 11px; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px; padding: 4px; }
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; }
+.cal-day {
+  min-height: 88px; border-radius: var(--radius-sm);
+  border: 1px solid transparent; padding: 6px;
+  font-size: 12px; position: relative;
+  background: var(--cream); transition: all .15s;
+}
+.cal-day:hover:not(.cal-empty) { border-color: var(--gold-light); background: #fdf9f4; }
+.cal-day.cal-empty { background: transparent; border-color: transparent; }
+.cal-day.cal-today { border-color: var(--gold); background: var(--champagne); }
+.cal-day-num { font-size: 13px; font-weight: 500; color: var(--text-dark); margin-bottom: 4px; }
+.cal-day.cal-empty .cal-day-num { color: transparent; }
+.cal-event {
+  font-size: 10px; padding: 2px 5px; border-radius: 8px;
+  margin-bottom: 2px; white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis; cursor: pointer; line-height: 1.4;
+}
+.cal-event-rent-g   { background: var(--rose-light);  color: var(--rose-dark); }
+.cal-event-rent-n   { background: var(--lilac-light); color: var(--lilac-dark); }
+.cal-event-rent-k   { background: var(--teal-light);  color: var(--teal-dark); }
+.cal-event-return-g { background: #E8F5F0; color: #4A9E82; }
+.cal-event-return-n { background: #F0EAF8; color: var(--lilac-dark); }
+.cal-event-return-k { background: #E4F2EF; color: var(--teal-dark); }
+
+/* ── RENTAL LIST (calendar tab) ── */
+.rental-log { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; }
+.rental-log-item {
+  background: var(--cream); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 14px 16px;
+  display: grid; grid-template-columns: 3px 1fr; gap: 12px; align-items: start;
+}
+.rental-log-bar { width: 3px; border-radius: 3px; align-self: stretch; }
+.rental-log-bar.g { background: var(--rose); }
+.rental-log-bar.n { background: var(--lilac); }
+.rental-log-bar.k { background: var(--teal); }
+.rental-log-main { display: flex; flex-direction: column; gap: 4px; }
+.rental-log-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.rental-log-name { font-weight: 600; font-size: 14px; }
+.rental-log-dates { font-size: 12px; color: var(--text-light); }
+.rental-log-customer { font-size: 13px; color: var(--text-mid); }
+.rental-log-phone { font-size: 12px; color: var(--text-light); }
+.rental-log-note { font-size: 12px; color: var(--text-mid); font-style: italic; margin-top: 4px; }
+
+.cal-legend { display: flex; gap: 16px; margin-top: 20px; flex-wrap: wrap; border-top: 1px solid var(--border); padding-top: 16px; }
+.cal-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-mid); }
+.cal-legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.cal-tab-bar { display: flex; gap: 4px; background: var(--champagne); border-radius: var(--radius-sm); padding: 4px; margin-bottom: 20px; max-width: 400px; }
+.cal-tab-btn {
+  flex: 1; padding: 7px 10px; border-radius: 6px; border: none;
+  background: none; cursor: pointer; font-size: 12px;
+  color: var(--text-mid); transition: all .2s; font-family: 'Inter', sans-serif; white-space: nowrap;
+}
+.cal-tab-btn.active { background: var(--white); color: var(--gold-dark); font-weight: 500; box-shadow: var(--shadow-sm); }
+
+/* ── TOAST ── */
+.toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
+.toast {
+  padding: 12px 20px; border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md); font-size: 13px;
+  display: flex; align-items: center; gap: 10px;
+  animation: toastIn .3s ease; min-width: 260px;
+}
+@keyframes toastIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+.toast-success { background: #F0FBF7; border: 1px solid #A8D8C8; color: #2E7D5A; }
+.toast-warning { background: #FFFBF0; border: 1px solid var(--gold-light); color: var(--gold-dark); }
+.toast-error   { background: #FFF5F5; border: 1px solid #F0C0C0; color: var(--danger); }
+
+/* ── PAGES ── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── UPLOAD ZONE ── */
+.upload-zone {
+  border: 2px dashed var(--border); border-radius: var(--radius);
+  padding: 28px; text-align: center; cursor: pointer;
+  transition: all .2s; color: var(--text-light);
+}
+.upload-zone:hover { border-color: var(--gold); color: var(--gold-dark); background: var(--champagne); }
+
+/* ── CONFLICT ALERT ── */
+.conflict-alert {
+  background: #FFF5F5; border: 1px solid #F0C0C0;
+  border-radius: var(--radius-sm); padding: 12px 16px;
+  font-size: 13px; color: var(--danger);
+  display: flex; align-items: center; gap: 8px; margin-bottom: 14px;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; }
+  .stats-grid { grid-template-columns: repeat(2,1fr); }
+  .detail-layout { grid-template-columns: 1fr; }
+  .topbar { padding: 0 16px; }
+  .content { padding: 16px; }
+  .menu-toggle { display: flex !important; }
+  .form-row { grid-template-columns: 1fr; }
+  .cal-day { min-height: 60px; }
+}
+@media (max-width: 560px) {
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .dress-grid { grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); }
+  .dress-photo { height: 160px; }
+  .cal-day { min-height: 48px; padding: 3px; }
+  .cal-event { display: none; }
+  .cal-day-num { font-size: 12px; }
+}
+.menu-toggle { display: none !important; }
+.overlay-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.3); z-index: 99; }
+.overlay-bg.show { display: block; }
+
+/* ── MISC ── */
+.empty-state { text-align: center; padding: 60px 20px; color: var(--text-light); }
+.empty-state .es-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-state p { font-size: 14px; }
+.rental-list { display: flex; flex-direction: column; gap: 10px; }
+.rental-item { background: var(--cream); border-radius: var(--radius-sm); padding: 12px 16px; border: 1px solid var(--border); }
+.rental-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.rental-customer { font-weight: 500; font-size: 14px; }
+.rental-dates { font-size: 12px; color: var(--text-light); }
+.divider { height: 1px; background: var(--border); margin: 16px 0; }
+.tab-bar { display: flex; gap: 4px; background: var(--champagne); border-radius: var(--radius-sm); padding: 4px; margin-bottom: 20px; }
+.tab-btn { flex: 1; padding: 8px 12px; border-radius: 6px; border: none; background: none; cursor: pointer; font-size: 13px; color: var(--text-mid); transition: all .2s; font-family: 'Inter', sans-serif; }
+.tab-btn.active { background: var(--white); color: var(--gold-dark); font-weight: 500; box-shadow: var(--shadow-sm); }
+.section-divider { height: 1px; background: var(--border); margin: 28px 0; }
+
+/* ── SAFE AREA (Notch / Dynamic Island / iPad) ── */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .sidebar {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .topbar {
+    padding-top: calc(0px + env(safe-area-inset-top));
+    height: calc(64px + env(safe-area-inset-top));
+  }
+  .toast-container {
+    bottom: calc(24px + env(safe-area-inset-bottom));
+    right: calc(24px + env(safe-area-inset-right));
+  }
+}
+
+/* ── QUALITY ENHANCEMENTS ── */
+/* Smooth scrolling */
+html { scroll-behavior: smooth; }
+
+/* Better focus rings */
+*:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* Sidebar logo subtle gradient accent */
+.sidebar-logo {
+  background: linear-gradient(135deg, var(--white) 60%, var(--champagne));
+}
+
+/* Topbar shimmer */
+.topbar {
+  box-shadow: 0 1px 0 var(--border), 0 2px 12px rgba(201,169,110,.06);
+}
+
+/* Stat cards subtle hover glow */
+.stat-card.total:hover   { box-shadow: 0 8px 32px rgba(201,169,110,.18); }
+.stat-card.rented:hover  { box-shadow: 0 8px 32px rgba(212,165,165,.18); }
+.stat-card.sold:hover    { box-shadow: 0 8px 32px rgba(168,197,181,.18); }
+.stat-card.available:hover { box-shadow: 0 8px 32px rgba(181,200,168,.18); }
+
+/* Dress card image shimmer on hover */
+.dress-card:hover .dress-photo { filter: brightness(1.03); }
+
+/* Calendar day today ring */
+.cal-day.cal-today .cal-day-num { color: var(--gold-dark); font-weight: 700; }
+
+/* Modal backdrop stronger blur on larger screens */
+@media (min-width: 900px) {
+  .modal-overlay { backdrop-filter: blur(8px); }
+}
+
+/* Rental log items — hover lift */
+.rental-log-item {
+  transition: box-shadow .2s, transform .2s;
+}
+.rental-log-item:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* PWA / Standalone mode — hide browser UI remnants */
+@media all and (display-mode: standalone) {
+  body { -webkit-user-select: none; user-select: none; }
+  input, textarea, select { -webkit-user-select: text; user-select: text; }
+}
+</style>
+</head>
+<body>
+
+<div class="overlay-bg" id="overlayBg" onclick="closeMobileMenu()"></div>
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <h1>DIL<span>A</span>MED</h1>
+    <p>Kıyafet Yönetim Sistemi</p>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-label">Genel</div>
+    <button class="nav-item active" onclick="showPage('dashboard',this)">
+      <span class="icon">🏠</span> Ana Ekran
+    </button>
+    <button class="nav-item" onclick="showPage('inventory',this)">
+      <span class="icon">👗</span> Tüm Ürünler
+    </button>
+    <button class="nav-item" onclick="showPage('calendar',this)">
+      <span class="icon">📅</span> Takvim & Kiralamalar
+    </button>
+    <div class="nav-label" style="margin-top:8px">Kategoriler</div>
+    <button class="nav-item" onclick="filterByCategory('gelinlik',this)">
+      <span class="icon">🤍</span> Gelinlikler
+    </button>
+    <button class="nav-item" onclick="filterByCategory('nisanlik',this)">
+      <span class="icon">💜</span> Nişanlıklar
+    </button>
+    <button class="nav-item" onclick="filterByCategory('kinalik',this)">
+      <span class="icon">🧡</span> Kınalıklar
+    </button>
+    <div class="nav-label" style="margin-top:8px">İşlemler</div>
+    <button class="nav-item" onclick="openAddDressModal()">
+      <span class="icon">✨</span> Ürün Ekle
+    </button>
+  </nav>
+  <div class="sidebar-footer">© 2025 DILAMED</div>
+</aside>
+
+<!-- ── MAIN ── -->
+<main class="main">
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="btn-icon menu-toggle" id="menuToggle" onclick="toggleMobileMenu()">☰</button>
+      <div class="topbar-title" id="pageTitle">Ana Ekran</div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-primary btn-sm" onclick="openAddDressModal()">+ Ürün Ekle</button>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- ── DASHBOARD ── -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card total">
+          <div class="stat-icon">👗</div>
+          <div class="stat-value" id="stat-total">0</div>
+          <div class="stat-label">Toplam Ürün</div>
+          <div class="stat-sub" id="stat-total-sub">Gelinlik · Nişanlık · Kınalık</div>
+        </div>
+        <div class="stat-card rented">
+          <div class="stat-icon">🎀</div>
+          <div class="stat-value" id="stat-rented">0</div>
+          <div class="stat-label">Şu An Kirada</div>
+          <div class="stat-sub">Aktif kiralama</div>
+        </div>
+        <div class="stat-card sold">
+          <div class="stat-icon">💍</div>
+          <div class="stat-value" id="stat-sold">0</div>
+          <div class="stat-label">Satılanlar</div>
+          <div class="stat-sub">Kalıcı satış</div>
+        </div>
+        <div class="stat-card available">
+          <div class="stat-icon">✨</div>
+          <div class="stat-value" id="stat-available">0</div>
+          <div class="stat-label">Müsait</div>
+          <div class="stat-sub">Kiralanabilir</div>
+        </div>
+      </div>
+
+      <!-- Category mini stats -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px">
+        <div style="background:var(--rose-light);border:1px solid var(--rose);border-radius:var(--radius);padding:14px 18px;display:flex;align-items:center;gap:12px">
+          <span style="font-size:24px">🤍</span>
+          <div><div style="font-family:Cormorant Garamond,serif;font-size:28px;font-weight:600;color:var(--rose-dark)" id="stat-g">0</div><div style="font-size:11px;color:var(--rose-dark);opacity:.8;text-transform:uppercase;letter-spacing:1px">Gelinlik</div></div>
+        </div>
+        <div style="background:var(--lilac-light);border:1px solid var(--lilac);border-radius:var(--radius);padding:14px 18px;display:flex;align-items:center;gap:12px">
+          <span style="font-size:24px">💜</span>
+          <div><div style="font-family:Cormorant Garamond,serif;font-size:28px;font-weight:600;color:var(--lilac-dark)" id="stat-n">0</div><div style="font-size:11px;color:var(--lilac-dark);opacity:.8;text-transform:uppercase;letter-spacing:1px">Nişanlık</div></div>
+        </div>
+        <div style="background:var(--teal-light);border:1px solid var(--teal);border-radius:var(--radius);padding:14px 18px;display:flex;align-items:center;gap:12px">
+          <span style="font-size:24px">🧡</span>
+          <div><div style="font-family:Cormorant Garamond,serif;font-size:28px;font-weight:600;color:var(--teal-dark)" id="stat-k">0</div><div style="font-size:11px;color:var(--teal-dark);opacity:.8;text-transform:uppercase;letter-spacing:1px">Kınalık</div></div>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <h2 class="section-title">Yaklaşan <span>Teslim & İade</span></h2>
+        <button class="btn btn-secondary btn-sm" onclick="showPage('calendar',document.querySelectorAll('.nav-item')[2])">Takvimi Gör →</button>
+      </div>
+      <div class="upcoming-card">
+        <table>
+          <thead>
+            <tr>
+              <th>Ürün</th><th>Kategori</th><th>Müşteri</th><th>Telefon</th><th>İşlem</th><th>Tarih</th><th>Durum</th>
+            </tr>
+          </thead>
+          <tbody id="upcomingBody"></tbody>
+        </table>
+      </div>
+
+      <div class="section-header" style="margin-top:8px">
+        <h2 class="section-title">Son <span>Eklenenler</span></h2>
+        <button class="btn btn-secondary btn-sm" onclick="showPage('inventory',document.querySelectorAll('.nav-item')[1])">Tümünü Gör →</button>
+      </div>
+      <div class="dress-grid" id="recentDresses" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr))"></div>
+    </div>
+
+    <!-- ── INVENTORY ── -->
+    <div class="page" id="page-inventory">
+      <div class="filters-bar">
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" id="searchInput" placeholder="Ürün adı veya kodu ara..." oninput="renderInventory()">
+        </div>
+        <select class="filter-select" id="filterCategory" onchange="renderInventory()">
+          <option value="">Tüm Kategoriler</option>
+          <option value="gelinlik">Gelinlik</option>
+          <option value="nisanlik">Nişanlık</option>
+          <option value="kinalik">Kınalık</option>
+        </select>
+        <select class="filter-select" id="filterStatus" onchange="renderInventory()">
+          <option value="">Tüm Durumlar</option>
+          <option value="available">Müsait</option>
+          <option value="rented">Kiralandı</option>
+          <option value="sold">Satıldı</option>
+        </select>
+        <select class="filter-select" id="filterStyle" onchange="renderInventory()">
+          <option value="">Tüm Tarzlar</option>
+          <option value="A Kesim">A Kesim</option>
+          <option value="Helen">Helen</option>
+          <option value="Prenses">Prenses</option>
+          <option value="Mermaid">Mermaid</option>
+          <option value="Balo">Balo</option>
+          <option value="Minimalist">Minimalist</option>
+          <option value="Klasik">Klasik</option>
+          <option value="Modern">Modern</option>
+        </select>
+      </div>
+      <div class="dress-grid" id="inventoryGrid"></div>
+    </div>
+
+    <!-- ── DETAIL ── -->
+    <div class="page" id="page-detail">
+      <button class="detail-back" onclick="showPage('inventory',document.querySelectorAll('.nav-item')[1])">← Ürünlere Dön</button>
+      <div class="detail-layout" id="detailLayout"></div>
+    </div>
+
+    <!-- ── CALENDAR ── -->
+    <div class="page" id="page-calendar">
+      <div class="calendar-wrapper">
+        <div class="cal-header">
+          <div class="cal-header-left">
+            <div class="cal-title" id="calTitle"></div>
+            <select class="cal-filter-select" id="calCatFilter" onchange="renderCalendar()">
+              <option value="">Tüm Kategoriler</option>
+              <option value="gelinlik">Gelinlik</option>
+              <option value="nisanlik">Nişanlık</option>
+              <option value="kinalik">Kınalık</option>
+            </select>
+          </div>
+          <div class="cal-nav">
+            <button class="cal-btn" onclick="changeMonth(-1)">← Önceki</button>
+            <button class="cal-btn" onclick="changeMonth(0)">Bugün</button>
+            <button class="cal-btn" onclick="changeMonth(1)">Sonraki →</button>
+          </div>
+        </div>
+
+        <div class="cal-tab-bar">
+          <button class="cal-tab-btn active" onclick="switchCalView('month',this)">📅 Takvim</button>
+          <button class="cal-tab-btn" onclick="switchCalView('list',this)">📋 Liste</button>
+          <button class="cal-tab-btn" onclick="openDirectRentModal()">+ Kiralama Ekle</button>
+        </div>
+
+        <!-- MONTH VIEW -->
+        <div id="calMonthView">
+          <div class="cal-grid-head">
+            <div class="cal-day-name">Pzt</div><div class="cal-day-name">Sal</div>
+            <div class="cal-day-name">Çar</div><div class="cal-day-name">Per</div>
+            <div class="cal-day-name">Cum</div><div class="cal-day-name">Cmt</div>
+            <div class="cal-day-name">Paz</div>
+          </div>
+          <div class="cal-grid" id="calGrid"></div>
+          <div class="cal-legend">
+            <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--rose)"></div>Gelinlik Teslim</div>
+            <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#4A9E82"></div>Gelinlik İade</div>
+            <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--lilac)"></div>Nişanlık Teslim</div>
+            <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--teal)"></div>Kınalık Teslim</div>
+            <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--gold)"></div>Bugün</div>
+          </div>
+        </div>
+
+        <!-- LIST VIEW -->
+        <div id="calListView" style="display:none">
+          <div id="rentalLogList"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+
+<!-- ── TOAST ── -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ── ADD DRESS MODAL ── -->
+<div class="modal-overlay" id="addDressModal" style="display:none">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>✨ Yeni Ürün Ekle</h2>
+      <button class="modal-close" onclick="closeModal('addDressModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Kategori *</label>
+        <div class="cat-tab-group">
+          <button type="button" class="cat-tab sel-gelinlik" id="catTab-gelinlik" onclick="selectCategory('gelinlik')">🤍 Gelinlik</button>
+          <button type="button" class="cat-tab" id="catTab-nisanlik" onclick="selectCategory('nisanlik')">💜 Nişanlık</button>
+          <button type="button" class="cat-tab" id="catTab-kinalik"  onclick="selectCategory('kinalik')">🧡 Kınalık</button>
+        </div>
+        <input type="hidden" id="addCategory" value="gelinlik">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Fotoğraf</label>
+        <div class="upload-zone" onclick="document.getElementById('dressPhotoInput').click()" id="addPhotoZone">
+          <div style="font-size:32px;margin-bottom:8px">📷</div>
+          <div style="font-size:13px;font-weight:500">Fotoğraf Yükle</div>
+          <div style="font-size:11px;margin-top:4px;color:var(--text-light)">JPG, PNG desteklenir</div>
+        </div>
+        <input type="file" id="dressPhotoInput" accept="image/*" onchange="previewPhoto(this,'addPhotoZone','addPhotoPreview')">
+        <img id="addPhotoPreview" style="display:none;margin-top:8px;border-radius:8px;max-height:120px;object-fit:cover;width:100%">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Ürün Adı *</label>
+          <input type="text" class="form-input" id="addName" placeholder="örn: Bella">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Kod *</label>
+          <input type="text" class="form-input" id="addCode" placeholder="örn: BL-001">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Tarz</label>
+          <select class="form-select" id="addStyle">
+            <option>A Kesim</option><option>Helen</option><option>Prenses</option>
+            <option>Mermaid</option><option>Balo</option><option>Minimalist</option>
+            <option>Klasik</option><option>Modern</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Beden</label>
+          <select class="form-select" id="addSize">
+            <option>34</option><option>36</option><option>38</option>
+            <option>40</option><option>42</option><option>44</option><option>46</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Kiralama Fiyatı (₺)</label>
+          <input type="number" class="form-input" id="addRentPrice" placeholder="5000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Satış Fiyatı (₺)</label>
+          <input type="number" class="form-input" id="addSalePrice" placeholder="25000">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Renk / Kumaş</label>
+        <input type="text" class="form-input" id="addFabric" placeholder="örn: Beyaz Saten, Fildişi Dantel">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notlar</label>
+        <textarea class="form-textarea" id="addNotes" placeholder="Ürün hakkında notlar..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('addDressModal')">İptal</button>
+      <button class="btn btn-primary" onclick="addDress()">✨ Ürün Ekle</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── RENT MODAL ── -->
+<div class="modal-overlay" id="rentModal" style="display:none">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>🎀 Kiralama Kaydı</h2>
+      <button class="modal-close" onclick="closeModal('rentModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="conflictAlert" class="conflict-alert" style="display:none">
+        ⚠️ <span id="conflictMsg"></span>
+      </div>
+      <!-- Product selector (when opened from calendar directly) -->
+      <div class="form-group" id="rentProductGroup" style="display:none">
+        <label class="form-label">Ürün *</label>
+        <select class="form-select" id="rentProductSelect"></select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Müşteri Adı Soyadı *</label>
+          <input type="text" class="form-input" id="rentCustomer" placeholder="Ayşe Yılmaz">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Telefon *</label>
+          <input type="tel" class="form-input" id="rentPhone" placeholder="0532 000 00 00">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Teslim Tarihi *</label>
+          <input type="date" class="form-input" id="rentStart" onchange="checkConflict()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">İade Tarihi *</label>
+          <input type="date" class="form-input" id="rentEnd" onchange="checkConflict()">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Düğün / Etkinlik Tarihi</label>
+          <input type="date" class="form-input" id="rentWeddingDate">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Depozito (₺)</label>
+          <input type="number" class="form-input" id="rentDeposit" placeholder="1000">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Kalan Ödeme (₺)</label>
+        <input type="number" class="form-input" id="rentBalance" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notlar</label>
+        <textarea class="form-textarea" id="rentNotes" placeholder="Değişiklik talepleri, özel notlar..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('rentModal')">İptal</button>
+      <button class="btn btn-primary" onclick="saveRental()">🎀 Kiralama Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── SELL MODAL ── -->
+<div class="modal-overlay" id="sellModal" style="display:none">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>💍 Satış Kaydı</h2>
+      <button class="modal-close" onclick="closeModal('sellModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Müşteri Adı *</label>
+          <input type="text" class="form-input" id="sellCustomer" placeholder="Merve Kaya">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Telefon</label>
+          <input type="tel" class="form-input" id="sellPhone" placeholder="0533 000 00 00">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Satış Tarihi</label>
+          <input type="date" class="form-input" id="sellDate">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Satış Fiyatı (₺)</label>
+          <input type="number" class="form-input" id="sellPrice">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notlar</label>
+        <textarea class="form-textarea" id="sellNotes"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('sellModal')">İptal</button>
+      <button class="btn btn-primary" onclick="saveSale()">💍 Satışı Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── DAY DETAIL MODAL ── -->
+<div class="modal-overlay" id="dayModal" style="display:none">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <h2 id="dayModalTitle">Günlük Detay</h2>
+      <button class="modal-close" onclick="closeModal('dayModal')">✕</button>
+    </div>
+    <div class="modal-body" id="dayModalBody"></div>
+  </div>
+</div>
+
+<!-- ── DELETE RENTAL CONFIRM MODAL ── -->
+<div class="modal-overlay" id="deleteRentalModal" style="display:none">
+  <div class="modal" style="max-width:340px">
+    <div class="modal-header">
+      <h2>🗑️ Kaydı Sil</h2>
+      <button class="modal-close" onclick="closeModal('deleteRentalModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p id="deleteRentalMsg" style="font-size:14px;color:var(--text-mid);line-height:1.6"></p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('deleteRentalModal')">İptal</button>
+      <button class="btn btn-danger" id="deleteRentalConfirmBtn">Evet, Sil</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── EDIT RENTAL MODAL ── -->
+<div class="modal-overlay" id="editRentalModal" style="display:none">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>✏️ Kiralama Düzenle</h2>
+      <button class="modal-close" onclick="closeModal('editRentalModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editRentalDressId">
+      <input type="hidden" id="editRentalIndex">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Müşteri Adı Soyadı *</label>
+          <input type="text" class="form-input" id="editRentalCustomer" placeholder="Ayşe Yılmaz">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Telefon</label>
+          <input type="tel" class="form-input" id="editRentalPhone" placeholder="0532 000 00 00">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Teslim Tarihi *</label>
+          <input type="date" class="form-input" id="editRentalStart">
+        </div>
+        <div class="form-group">
+          <label class="form-label">İade Tarihi *</label>
+          <input type="date" class="form-input" id="editRentalEnd">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Düğün / Etkinlik Tarihi</label>
+          <input type="date" class="form-input" id="editRentalWeddingDate">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Depozito (₺)</label>
+          <input type="number" class="form-input" id="editRentalDeposit" placeholder="1000">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Kalan Ödeme (₺)</label>
+        <input type="number" class="form-input" id="editRentalBalance" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notlar</label>
+        <textarea class="form-textarea" id="editRentalNotes" placeholder="Değişiklik talepleri, özel notlar..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('editRentalModal')">İptal</button>
+      <button class="btn btn-primary" onclick="saveEditRental()">💾 Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── EDIT DRESS MODAL ── -->
+<div class="modal-overlay" id="editDressModal" style="display:none">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-header">
+      <h2>✏️ Ürünü Düzenle</h2>
+      <button class="modal-close" onclick="closeModal('editDressModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Kategori *</label>
+        <div class="cat-tab-group">
+          <button type="button" class="cat-tab" id="editCatTab-gelinlik" onclick="selectEditCategory('gelinlik')">🤍 Gelinlik</button>
+          <button type="button" class="cat-tab" id="editCatTab-nisanlik" onclick="selectEditCategory('nisanlik')">💜 Nişanlık</button>
+          <button type="button" class="cat-tab" id="editCatTab-kinalik"  onclick="selectEditCategory('kinalik')">🧡 Kınalık</button>
+        </div>
+        <input type="hidden" id="editCategory" value="gelinlik">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Ürün Adı *</label>
+          <input type="text" class="form-input" id="editName" placeholder="örn: Bella">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Ürün Kodu *</label>
+          <input type="text" class="form-input" id="editCode" placeholder="örn: BL-001">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Tarz</label>
+          <select class="form-select" id="editStyle">
+            <option value="">Seçiniz</option>
+            <option value="A Kesim">A Kesim</option>
+            <option value="Helen">Helen</option>
+            <option value="Prenses">Prenses</option>
+            <option value="Mermaid">Mermaid</option>
+            <option value="Balo">Balo</option>
+            <option value="Minimalist">Minimalist</option>
+            <option value="Klasik">Klasik</option>
+            <option value="Modern">Modern</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Beden</label>
+          <select class="form-select" id="editSize">
+            <option value="">Seçiniz</option>
+            <option value="34">34</option><option value="36">36</option>
+            <option value="38">38</option><option value="40">40</option>
+            <option value="42">42</option><option value="44">44</option>
+            <option value="46">46</option><option value="48">48</option>
+            <option value="Özel">Özel</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Kiralama Fiyatı (₺)</label>
+          <input type="number" class="form-input" id="editRentPrice" placeholder="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Satış Fiyatı (₺)</label>
+          <input type="number" class="form-input" id="editSalePrice" placeholder="0">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Kumaş / Malzeme</label>
+        <input type="text" class="form-input" id="editFabric" placeholder="örn: Fildişi Saten">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Durum</label>
+        <select class="form-select" id="editStatus">
+          <option value="available">Müsait</option>
+          <option value="rented">Kiralandı</option>
+          <option value="sold">Satıldı</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notlar</label>
+        <textarea class="form-textarea" id="editNotes" placeholder="Ürün hakkında notlar..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer" style="justify-content:space-between">
+      <button class="btn btn-danger btn-sm" onclick="confirmDeleteDress()">🗑️ Ürünü Sil</button>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-secondary" onclick="closeModal('editDressModal')">İptal</button>
+        <button class="btn btn-primary" onclick="saveEditDress()">💾 Kaydet</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──
+let dresses = [];
+let currentDressId = null;
+let rentFromCalendar = false;
+let calendarDate = new Date();
+let calView = 'month';
+
+// ── LOCAL STORAGE ──
+const STORAGE_KEY  = 'dilamed_dresses';
+const NEXTID_KEY   = 'dilamed_nextid';
+
+function saveData(){
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(dresses));
+    localStorage.setItem(NEXTID_KEY, String(nextId));
+  } catch(e){ console.warn('Kayıt hatası:', e); }
+}
+
+function loadData(){
+  try {
+    const saved   = localStorage.getItem(STORAGE_KEY);
+    const savedId = localStorage.getItem(NEXTID_KEY);
+    if(saved){
+      dresses = JSON.parse(saved);
+      nextId  = savedId ? parseInt(savedId) : (Math.max(...dresses.map(d=>d.id), 10) + 1);
+      return;
+    }
+  } catch(e){ console.warn('Yükleme hatası:', e); }
+  // İlk kullanım: örnek verilerle başla
+  dresses = mockDresses;
+  nextId  = 11;
+  saveData();
+}
+
+// ── MOCK DATA ──
+const mockDresses = [
+  { id:1, category:'gelinlik', name:'Bella', code:'BL-001', style:'A Kesim', size:'38',
+    rentPrice:4500, salePrice:22000, fabric:'Fildişi Saten', notes:'Omuzdan kayışlı, dantelli eteklik',
+    status:'rented', photo:null,
+    rentals:[{customer:'Elif Demir',phone:'0532 111 22 33',start:'2025-07-10',end:'2025-07-14',weddingDate:'2025-07-12',deposit:1000,balance:3500,notes:'Bel alımı yapılacak'}] },
+  { id:2, category:'gelinlik', name:'Magnolia', code:'BL-002', style:'Mermaid', size:'36',
+    rentPrice:5500, salePrice:28000, fabric:'Beyaz Mikado', notes:'Uzun kuyruklu, işlemeli korsaj',
+    status:'available', photo:null, rentals:[] },
+  { id:3, category:'gelinlik', name:'Aurora', code:'BL-003', style:'Prenses', size:'40',
+    rentPrice:6000, salePrice:35000, fabric:'Şampanya Tül', notes:'5 kat tül, taş süslemeli',
+    status:'sold', photo:null, rentals:[],
+    sale:{customer:'Seda Arslan',phone:'0543 222 33 44',date:'2025-06-20',price:33000} },
+  { id:4, category:'gelinlik', name:'Sofia', code:'BL-004', style:'Helen', size:'38',
+    rentPrice:4000, salePrice:20000, fabric:'Kırık Beyaz Krep', notes:'V yaka, yüksek yırtmaç',
+    status:'available', photo:null, rentals:[] },
+  { id:5, category:'gelinlik', name:'Celeste', code:'BL-005', style:'Minimalist', size:'36',
+    rentPrice:3500, salePrice:18000, fabric:'Beyaz Krep Saten', notes:'Sırt dekolteli, sade kesim',
+    status:'rented', photo:null,
+    rentals:[{customer:'Büşra Çelik',phone:'0544 333 44 55',start:'2025-07-18',end:'2025-07-22',weddingDate:'2025-07-19',deposit:800,balance:2700,notes:''}] },
+  { id:6, category:'gelinlik', name:'Valentina', code:'BL-006', style:'Balo', size:'42',
+    rentPrice:7000, salePrice:40000, fabric:'Altın Organze', notes:'Off-shoulder, kristal taş detayı',
+    status:'available', photo:null, rentals:[] },
+  { id:7, category:'nisanlik', name:'Lila', code:'NL-001', style:'Klasik', size:'36',
+    rentPrice:3000, salePrice:15000, fabric:'Lila Saten', notes:'Straplez, bel vurgulu',
+    status:'available', photo:null, rentals:[] },
+  { id:8, category:'nisanlik', name:'Violet', code:'NL-002', style:'Modern', size:'38',
+    rentPrice:3500, salePrice:17000, fabric:'Leylak Dantel', notes:'Uzun kollu, deri kemer',
+    status:'rented', photo:null,
+    rentals:[{customer:'Zehra Aktaş',phone:'0535 444 55 66',start:'2025-07-20',end:'2025-07-23',weddingDate:'2025-07-21',deposit:700,balance:2800,notes:'Kollar kısaltılacak'}] },
+  { id:9, category:'kinalik',  name:'Zümrüt', code:'KL-001', style:'Klasik', size:'40',
+    rentPrice:2500, salePrice:12000, fabric:'Zümrüt Kadife', notes:'Geleneksel işleme detayları',
+    status:'available', photo:null, rentals:[] },
+  { id:10, category:'kinalik', name:'Narin', code:'KL-002', style:'Modern', size:'38',
+    rentPrice:2000, salePrice:10000, fabric:'Yeşil Tül', notes:'Hafif kesim, modern tasarım',
+    status:'rented', photo:null,
+    rentals:[{customer:'Merve Doğan',phone:'0537 555 66 77',start:'2025-07-25',end:'2025-07-27',weddingDate:'2025-07-26',deposit:500,balance:1500,notes:''}] },
+];
+let nextId = 11;
+loadData(); // localStorage'dan yükle, yoksa mock ile başla
+
+// ── UTILITIES ──
+function fmt(n){ return Number(n).toLocaleString('tr-TR'); }
+function fmtDate(d){ if(!d) return '—'; const [y,m,day]=d.split('-'); return `${day}.${m}.${y}`; }
+function today(){ return new Date().toISOString().split('T')[0]; }
+function datesOverlap(s1,e1,s2,e2){ return s1<=e2 && e1>=s2; }
+function daysUntil(dateStr){ const d=new Date(dateStr); const t=new Date(); t.setHours(0,0,0,0); return Math.round((d-t)/(1000*60*60*24)); }
+
+function catLabel(c){ return c==='gelinlik'?'Gelinlik':c==='nisanlik'?'Nişanlık':'Kınalık'; }
+function catIcon(c){ return c==='gelinlik'?'🤍':c==='nisanlik'?'💜':'🧡'; }
+function catBadgeClass(c){ return `cat-badge-${c}`; }
+
+// ── TOAST ──
+function showToast(msg,type='success'){
+  const c=document.getElementById('toastContainer');
+  const t=document.createElement('div');
+  t.className=`toast toast-${type}`;
+  const icons={success:'✅',warning:'⚠️',error:'❌'};
+  t.innerHTML=`<span>${icons[type]||'ℹ️'}</span><span>${msg}</span>`;
+  c.appendChild(t);
+  setTimeout(()=>{ t.style.opacity='0'; t.style.transform='translateX(20px)'; t.style.transition='all .3s'; setTimeout(()=>t.remove(),300); },3000);
+}
+
+// ── PAGE NAV ──
+function showPage(name, navEl){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(navEl) navEl.classList.add('active');
+  const titles={dashboard:'Ana Ekran',inventory:'Tüm Ürünler',detail:'Ürün Detayı',calendar:'Takvim & Kiralamalar'};
+  document.getElementById('pageTitle').textContent=titles[name]||name;
+  if(name==='dashboard') renderDashboard();
+  if(name==='inventory') renderInventory();
+  if(name==='calendar') renderCalendar();
+  closeMobileMenu();
+}
+
+function filterByCategory(cat, navEl){
+  showPage('inventory', navEl);
+  document.getElementById('filterCategory').value = cat;
+  renderInventory();
+}
+
+// ── MOBILE ──
+function toggleMobileMenu(){ document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlayBg').classList.toggle('show'); }
+function closeMobileMenu(){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlayBg').classList.remove('show'); }
+
+// ── MODAL ──
+function openModal(id){ document.getElementById(id).style.display='flex'; }
+function closeModal(id){ document.getElementById(id).style.display='none'; }
+function openAddDressModal(){ selectCategory('gelinlik'); openModal('addDressModal'); }
+
+// ── STATUS ──
+function statusLabel(s){ return s==='available'?'Müsait':s==='rented'?'Kiralandı':'Satıldı'; }
+function statusBadge(s){ const map={available:'badge-available',rented:'badge-rented',sold:'badge-sold'}; return `<span class="badge ${map[s]||''}">${statusLabel(s)}</span>`; }
+
+// ── CATEGORY SELECT ──
+function selectCategory(cat){
+  document.getElementById('addCategory').value=cat;
+  ['gelinlik','nisanlik','kinalik'].forEach(c=>{
+    const btn=document.getElementById('catTab-'+c);
+    btn.className='cat-tab'+(c===cat?' sel-'+c:'');
+  });
+}
+
+// ── DASHBOARD ──
+function renderDashboard(){
+  const total=dresses.length;
+  const rented=dresses.filter(d=>d.status==='rented').length;
+  const sold=dresses.filter(d=>d.status==='sold').length;
+  const available=dresses.filter(d=>d.status==='available').length;
+  document.getElementById('stat-total').textContent=total;
+  document.getElementById('stat-rented').textContent=rented;
+  document.getElementById('stat-sold').textContent=sold;
+  document.getElementById('stat-available').textContent=available;
+  document.getElementById('stat-g').textContent=dresses.filter(d=>d.category==='gelinlik').length;
+  document.getElementById('stat-n').textContent=dresses.filter(d=>d.category==='nisanlik').length;
+  document.getElementById('stat-k').textContent=dresses.filter(d=>d.category==='kinalik').length;
+
+  // Upcoming
+  const t=new Date(); t.setHours(0,0,0,0);
+  const weekEnd=new Date(t); weekEnd.setDate(weekEnd.getDate()+7);
+  const rows=[];
+  dresses.forEach(d=>{
+    d.rentals.forEach(r=>{
+      const start=new Date(r.start); const end=new Date(r.end);
+      if(start>=t&&start<=weekEnd) rows.push({dress:d,rental:r,type:'Teslim',date:r.start});
+      if(end>=t&&end<=weekEnd) rows.push({dress:d,rental:r,type:'İade',date:r.end});
+    });
+  });
+  rows.sort((a,b)=>a.date.localeCompare(b.date));
+  const body=document.getElementById('upcomingBody');
+  if(rows.length===0){
+    body.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-light)">Bu hafta yaklaşan teslim veya iade bulunmuyor 🌸</td></tr>`;
+  } else {
+    body.innerHTML=rows.map(row=>{
+      const du=daysUntil(row.date);
+      const badge=du===0?`<span class="badge badge-warning">Bugün</span>`:du<0?`<span class="badge badge-overdue">Gecikti</span>`:`<span class="badge badge-available">${du} gün</span>`;
+      return `<tr>
+        <td><strong>${row.dress.name}</strong> <span style="color:var(--text-light);font-size:11px">${row.dress.code}</span></td>
+        <td><span class="badge cat-badge-${row.dress.category}">${catIcon(row.dress.category)} ${catLabel(row.dress.category)}</span></td>
+        <td>${row.rental.customer}</td>
+        <td>${row.rental.phone}</td>
+        <td><span class="badge ${row.type==='Teslim'?'badge-rented':'badge-available'}">${row.type}</span></td>
+        <td>${fmtDate(row.date)}</td>
+        <td>${badge}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  const recent=[...dresses].slice(-6).reverse();
+  document.getElementById('recentDresses').innerHTML=recent.map(d=>dressCardHTML(d)).join('');
+}
+
+// ── INVENTORY ──
+function renderInventory(){
+  const q=(document.getElementById('searchInput').value||'').toLowerCase();
+  const fc=document.getElementById('filterCategory').value;
+  const fs=document.getElementById('filterStatus').value;
+  const fst=document.getElementById('filterStyle').value;
+  let filtered=dresses.filter(d=>{
+    return (!q||d.name.toLowerCase().includes(q)||d.code.toLowerCase().includes(q))
+      &&(!fc||d.category===fc)&&(!fs||d.status===fs)&&(!fst||d.style===fst);
+  });
+  const grid=document.getElementById('inventoryGrid');
+  if(filtered.length===0){
+    grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><div class="es-icon">🔍</div><p>Arama kriterlerine uygun ürün bulunamadı.</p></div>`;
+  } else {
+    grid.innerHTML=filtered.map(d=>dressCardHTML(d)).join('');
+  }
+}
+
+function dressCardHTML(d){
+  const photoHTML=d.photo
+    ?`<img src="${d.photo}" alt="${d.name}">`
+    :`<div class="dress-photo-placeholder"><div class="ph-icon">${catIcon(d.category)}</div><span>${d.style}</span></div>`;
+  return `<div class="dress-card" onclick="openDetail(${d.id})">
+    <div class="dress-photo">
+      ${photoHTML}
+      <div class="dress-status-badge">${statusBadge(d.status)}</div>
+      <div class="dress-cat-badge cat-badge-${d.category}">${catIcon(d.category)} ${catLabel(d.category)}</div>
+    </div>
+    <div class="dress-info">
+      <div class="dress-code">${d.code}</div>
+      <div class="dress-name">${d.name}</div>
+      <div class="dress-meta">
+        <span class="dress-style">${d.style} · ${d.size}</span>
+        <span class="dress-price">₺${fmt(d.rentPrice)}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── DETAIL ──
+function openDetail(id){
+  currentDressId=id;
+  const d=dresses.find(x=>x.id===id); if(!d) return;
+  showPage('detail',null);
+  const photoHTML=d.photo
+    ?`<img src="${d.photo}" alt="${d.name}">`
+    :`<div class="detail-photo-upload" onclick="document.getElementById('detailPhotoInput').click()">
+        <div class="upload-icon">${catIcon(d.category)}</div>
+        <div style="font-size:14px;font-weight:500">Fotoğraf Yükle</div>
+        <div class="upload-hint">Tıklayın veya dosya sürükleyin</div>
+      </div>`;
+  const rentHistoryHTML=d.rentals.length>0
+    ?'<div class="rental-list">'+d.rentals.map((r,i)=>{
+        const depositLine=r.deposit?'<div style="font-size:12px;color:var(--text-mid);margin-top:4px">💰 Dep: ₺'+fmt(r.deposit)+(r.balance?' · Kalan: ₺'+fmt(r.balance):'')+' </div>':'';
+        const notesLine=r.notes?'<div style="font-size:12px;color:var(--text-mid);margin-top:6px;font-style:italic">'+r.notes+'</div>':'';
+        const weddingPart=r.weddingDate?' · 💒 '+fmtDate(r.weddingDate):'';
+        return '<div class="rental-item">'
+          +'<div class="rental-item-header">'
+          +'<span class="rental-customer">👤 '+r.customer+'</span>'
+          +'<div style="display:flex;gap:6px;align-items:center">'
+          +'<span class="badge badge-rented" style="font-size:10px">Kiralama</span>'
+          +'<button class="btn btn-secondary btn-sm" style="padding:3px 10px;font-size:11px" onclick="openEditRentalModal('+d.id+','+i+')">✏️ Düzenle</button>'
+          +'<button class="btn btn-danger btn-sm" style="padding:3px 10px;font-size:11px" onclick="deleteRental('+d.id+','+i+')">🗑️</button>'
+          +'</div></div>'
+          +'<div class="rental-dates">📅 '+fmtDate(r.start)+' — '+fmtDate(r.end)+'</div>'
+          +'<div style="font-size:12px;color:var(--text-light);margin-top:4px">📞 '+r.phone+weddingPart+'</div>'
+          +depositLine+notesLine
+          +'</div>';
+      }).join('')+'</div>'
+    :'<div style="color:var(--text-light);font-size:13px;text-align:center;padding:20px">Henüz kiralama kaydı yok</div>';
+
+  let actionBtns='';
+  if(d.status==='available'){
+    actionBtns=`<button class="btn btn-rose" onclick="openRentModal()">🎀 Kirala</button>
+                <button class="btn btn-primary" onclick="openSellModal()">💍 Sat</button>`;
+  } else if(d.status==='rented'){
+    actionBtns=`<button class="btn btn-secondary" onclick="returnDress(${d.id})">↩️ İade Al</button>`;
+  } else {
+    actionBtns=`<span style="color:var(--text-light);font-size:13px">Bu ürün satılmıştır.</span>`;
+  }
+
+  document.getElementById('detailLayout').innerHTML=`
+    <div>
+      <div class="detail-photo-area" id="detailPhotoArea">${photoHTML}</div>
+      <input type="file" id="detailPhotoInput" accept="image/*" onchange="uploadDetailPhoto(this,${d.id})">
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('detailPhotoInput').click()">📷 Fotoğraf Değiştir</button>
+        <button class="btn btn-primary btn-sm" onclick="openEditModal(${d.id})">✏️ Ürünü Düzenle</button>
+      </div>
+    </div>
+    <div class="detail-info">
+      <div class="info-card">
+        <h3>Ürün Bilgileri</h3>
+        <div class="info-row"><span class="info-key">Kategori</span><span class="info-val"><span class="badge cat-badge-${d.category}">${catIcon(d.category)} ${catLabel(d.category)}</span></span></div>
+        <div class="info-row"><span class="info-key">Ad / Kod</span><span class="info-val">${d.name} — ${d.code}</span></div>
+        <div class="info-row"><span class="info-key">Tarz</span><span class="info-val">${d.style}</span></div>
+        <div class="info-row"><span class="info-key">Beden</span><span class="info-val">${d.size}</span></div>
+        <div class="info-row"><span class="info-key">Kumaş</span><span class="info-val">${d.fabric||'—'}</span></div>
+        <div class="info-row"><span class="info-key">Kiralama</span><span class="info-val" style="color:var(--gold-dark);font-weight:600">₺${fmt(d.rentPrice)}</span></div>
+        <div class="info-row"><span class="info-key">Satış</span><span class="info-val">₺${fmt(d.salePrice)}</span></div>
+        <div class="info-row"><span class="info-key">Durum</span><span class="info-val">${statusBadge(d.status)}</span></div>
+        ${d.notes?`<div class="divider"></div><div style="font-size:12px;color:var(--text-mid);font-style:italic">${d.notes}</div>`:''}
+      </div>
+      <div class="info-card">
+        <h3>İşlemler</h3>
+        <div class="action-buttons">${actionBtns}</div>
+      </div>
+      <div class="info-card">
+        <h3>Kiralama Geçmişi <span style="font-size:13px;color:var(--text-light)">(${d.rentals.length})</span></h3>
+        ${rentHistoryHTML}
+      </div>
+    </div>`;
+}
+
+function uploadDetailPhoto(input,id){
+  const file=input.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{ const d=dresses.find(x=>x.id===id); if(d){ d.photo=e.target.result; saveData(); openDetail(id); showToast('Fotoğraf güncellendi'); } };
+  reader.readAsDataURL(file);
+}
+
+// ── RENT MODAL ──
+function openRentModal(){
+  rentFromCalendar=false;
+  document.getElementById('rentProductGroup').style.display='none';
+  clearRentForm();
+  openModal('rentModal');
+}
+
+function openDirectRentModal(){
+  rentFromCalendar=true;
+  // populate product select
+  const sel=document.getElementById('rentProductSelect');
+  sel.innerHTML=dresses.filter(d=>d.status==='available').map(d=>
+    `<option value="${d.id}">${catIcon(d.category)} ${d.name} (${d.code}) — ${catLabel(d.category)}</option>`
+  ).join('');
+  if(!sel.innerHTML){ showToast('Müsait ürün bulunmuyor','warning'); return; }
+  document.getElementById('rentProductGroup').style.display='block';
+  currentDressId=null;
+  clearRentForm();
+  openModal('rentModal');
+}
+
+function clearRentForm(){
+  ['rentStart','rentEnd','rentCustomer','rentPhone','rentWeddingDate','rentDeposit','rentBalance','rentNotes']
+    .forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('conflictAlert').style.display='none';
+}
+
+function checkConflict(){
+  const id=rentFromCalendar
+    ? parseInt(document.getElementById('rentProductSelect').value)
+    : currentDressId;
+  const d=dresses.find(x=>x.id===id); if(!d) return;
+  const s=document.getElementById('rentStart').value;
+  const e=document.getElementById('rentEnd').value;
+  if(!s||!e) return;
+  const conflict=d.rentals.find(r=>datesOverlap(s,e,r.start,r.end));
+  const alertEl=document.getElementById('conflictAlert');
+  if(conflict){
+    document.getElementById('conflictMsg').textContent=
+      `Bu tarihler ${conflict.customer} tarafından kiralanmış (${fmtDate(conflict.start)} – ${fmtDate(conflict.end)}). Lütfen farklı tarih seçin.`;
+    alertEl.style.display='flex';
+  } else {
+    alertEl.style.display='none';
+  }
+}
+
+function saveRental(){
+  const id=rentFromCalendar
+    ? parseInt(document.getElementById('rentProductSelect').value)
+    : currentDressId;
+  const d=dresses.find(x=>x.id===id); if(!d) return;
+  const customer=document.getElementById('rentCustomer').value.trim();
+  const phone=document.getElementById('rentPhone').value.trim();
+  const start=document.getElementById('rentStart').value;
+  const end=document.getElementById('rentEnd').value;
+  const weddingDate=document.getElementById('rentWeddingDate').value;
+  const deposit=document.getElementById('rentDeposit').value;
+  const balance=document.getElementById('rentBalance').value;
+  const notes=document.getElementById('rentNotes').value.trim();
+  if(!customer||!start||!end){ showToast('Lütfen zorunlu alanları doldurun','error'); return; }
+  if(start>end){ showToast('İade tarihi teslim tarihinden önce olamaz','error'); return; }
+  const conflict=d.rentals.find(r=>datesOverlap(start,end,r.start,r.end));
+  if(conflict){ showToast('Bu tarih aralığında çakışma var!','error'); return; }
+  d.rentals.push({customer,phone,start,end,weddingDate,deposit,balance,notes});
+  d.status='rented';
+  saveData();
+  closeModal('rentModal');
+  showToast(`${d.name} başarıyla kiralandı 🎀`,'success');
+  if(rentFromCalendar){ renderCalendar(); }
+  else { openDetail(id); }
+}
+
+// ── SELL ──
+// ── EDIT RENTAL ──
+function openEditRentalModal(dressId, rentalIndex){
+  const d=dresses.find(x=>x.id===dressId); if(!d) return;
+  const r=d.rentals[rentalIndex]; if(!r) return;
+  document.getElementById('editRentalDressId').value=dressId;
+  document.getElementById('editRentalIndex').value=rentalIndex;
+  document.getElementById('editRentalCustomer').value=r.customer||'';
+  document.getElementById('editRentalPhone').value=r.phone||'';
+  document.getElementById('editRentalStart').value=r.start||'';
+  document.getElementById('editRentalEnd').value=r.end||'';
+  document.getElementById('editRentalWeddingDate').value=r.weddingDate||'';
+  document.getElementById('editRentalDeposit').value=r.deposit||'';
+  document.getElementById('editRentalBalance').value=r.balance||'';
+  document.getElementById('editRentalNotes').value=r.notes||'';
+  openModal('editRentalModal');
+}
+
+function saveEditRental(){
+  const dressId=parseInt(document.getElementById('editRentalDressId').value);
+  const rentalIndex=parseInt(document.getElementById('editRentalIndex').value);
+  const d=dresses.find(x=>x.id===dressId); if(!d) return;
+  const customer=document.getElementById('editRentalCustomer').value.trim();
+  const phone=document.getElementById('editRentalPhone').value.trim();
+  const start=document.getElementById('editRentalStart').value;
+  const end=document.getElementById('editRentalEnd').value;
+  const weddingDate=document.getElementById('editRentalWeddingDate').value;
+  const deposit=document.getElementById('editRentalDeposit').value;
+  const balance=document.getElementById('editRentalBalance').value;
+  const notes=document.getElementById('editRentalNotes').value.trim();
+  if(!customer||!start||!end){ showToast('Lütfen zorunlu alanları doldurun','error'); return; }
+  if(start>end){ showToast('İade tarihi teslim tarihinden önce olamaz','error'); return; }
+  const conflict=d.rentals.find((r,i)=>i!==rentalIndex && datesOverlap(start,end,r.start,r.end));
+  if(conflict){ showToast(`Bu tarihler ${conflict.customer} ile çakışıyor!`,'error'); return; }
+  d.rentals[rentalIndex]={customer,phone,start,end,weddingDate,deposit,balance,notes};
+  saveData();
+  closeModal('editRentalModal');
+  showToast('Kiralama kaydı güncellendi ✓','success');
+  openDetail(dressId);
+}
+
+function deleteRental(dressId, rentalIndex){
+  const d=dresses.find(x=>x.id===dressId); if(!d) return;
+  const r=d.rentals[rentalIndex]; if(!r) return;
+  document.getElementById('deleteRentalMsg').textContent=r.customer+' adlı müşterinin kiralama kaydı silinecek. Emin misiniz?';
+  document.getElementById('deleteRentalConfirmBtn').onclick=function(){
+    d.rentals.splice(rentalIndex,1);
+    if(d.status==='rented' && d.rentals.length===0) d.status='available';
+    saveData();
+    closeModal('deleteRentalModal');
+    showToast('Kiralama kaydı silindi','success');
+    openDetail(dressId);
+  };
+  openModal('deleteRentalModal');
+}
+
+function openSellModal(){
+  const d=dresses.find(x=>x.id===currentDressId);
+  document.getElementById('sellDate').value=today();
+  document.getElementById('sellPrice').value=d?d.salePrice:'';
+  document.getElementById('sellCustomer').value='';
+  document.getElementById('sellPhone').value='';
+  document.getElementById('sellNotes').value='';
+  openModal('sellModal');
+}
+function saveSale(){
+  const id=currentDressId; const d=dresses.find(x=>x.id===id); if(!d) return;
+  const customer=document.getElementById('sellCustomer').value.trim();
+  if(!customer){ showToast('Müşteri adı giriniz','error'); return; }
+  d.status='sold';
+  d.sale={
+    customer, phone:document.getElementById('sellPhone').value,
+    date:document.getElementById('sellDate').value,
+    price:document.getElementById('sellPrice').value,
+    notes:document.getElementById('sellNotes').value
+  };
+  saveData();
+  closeModal('sellModal');
+  showToast(`${d.name} satışı kaydedildi 💍`,'success');
+  openDetail(id);
+}
+
+// ── RETURN ──
+function returnDress(id){
+  const d=dresses.find(x=>x.id===id); if(!d) return;
+  if(!confirm(`${d.name} ürünü iade alınıyor. Devam etmek istiyor musunuz?`)) return;
+  d.status='available';
+  saveData();
+  showToast(`${d.name} iade alındı, envantere döndü ✅`,'success');
+  openDetail(id);
+}
+
+// ── ADD DRESS ──
+let addPhotoData=null;
+function previewPhoto(input,zoneId,previewId){
+  const file=input.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const prev=document.getElementById(previewId);
+    prev.src=e.target.result; prev.style.display='block';
+    addPhotoData=e.target.result;
+    document.getElementById(zoneId).style.display='none';
+  };
+  reader.readAsDataURL(file);
+}
+function addDress(){
+  const name=document.getElementById('addName').value.trim();
+  const code=document.getElementById('addCode').value.trim();
+  if(!name||!code){ showToast('Ad ve kod zorunludur','error'); return; }
+  dresses.push({
+    id:nextId++, category:document.getElementById('addCategory').value,
+    name, code,
+    style:document.getElementById('addStyle').value,
+    size:document.getElementById('addSize').value,
+    rentPrice:document.getElementById('addRentPrice').value||0,
+    salePrice:document.getElementById('addSalePrice').value||0,
+    fabric:document.getElementById('addFabric').value,
+    notes:document.getElementById('addNotes').value,
+    status:'available', photo:addPhotoData, rentals:[]
+  });
+  saveData();
+  closeModal('addDressModal');
+  addPhotoData=null;
+  ['addName','addCode','addRentPrice','addSalePrice','addFabric','addNotes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('addPhotoPreview').style.display='none';
+  document.getElementById('addPhotoZone').style.display='flex';
+  showToast(`${name} envantere eklendi ✨`,'success');
+  showPage('inventory',document.querySelectorAll('.nav-item')[1]);
+}
+
+// ── CALENDAR ──
+const catColors={
+  gelinlik:{rent:'cal-event-rent-g',ret:'cal-event-return-g'},
+  nisanlik:{rent:'cal-event-rent-n',ret:'cal-event-return-n'},
+  kinalik: {rent:'cal-event-rent-k',ret:'cal-event-return-k'},
+};
+
+function switchCalView(view, btn){
+  calView=view;
+  document.querySelectorAll('.cal-tab-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  document.getElementById('calMonthView').style.display=view==='month'?'block':'none';
+  document.getElementById('calListView').style.display=view==='list'?'block':'none';
+  if(view==='list') renderRentalList();
+}
+
+function renderCalendar(){
+  const y=calendarDate.getFullYear();
+  const m=calendarDate.getMonth();
+  const months=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+  document.getElementById('calTitle').textContent=`${months[m]} ${y}`;
+
+  const catF=document.getElementById('calCatFilter').value;
+
+  // Build events map
+  const events={};
+  dresses.forEach(d=>{
+    if(catF && d.category!==catF) return;
+    d.rentals.forEach(r=>{
+      if(!events[r.start]) events[r.start]=[];
+      events[r.start].push({type:'rent',dress:d.name,cat:d.category,customer:r.customer,dressId:d.id,rental:r});
+      if(!events[r.end]) events[r.end]=[];
+      events[r.end].push({type:'return',dress:d.name,cat:d.category,customer:r.customer,dressId:d.id,rental:r});
+    });
+  });
+
+  const firstDay=new Date(y,m,1);
+  let startDow=firstDay.getDay();
+  startDow=(startDow===0)?6:startDow-1;
+  const daysInMonth=new Date(y,m+1,0).getDate();
+  const todayStr=today();
+
+  const grid=document.getElementById('calGrid');
+  let html='';
+  for(let i=0;i<startDow;i++) html+=`<div class="cal-day cal-empty"><div class="cal-day-num"></div></div>`;
+  for(let day=1;day<=daysInMonth;day++){
+    const dateStr=`${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const isToday=dateStr===todayStr;
+    const dayEvs=events[dateStr]||[];
+    const evHTML=dayEvs.slice(0,3).map(e=>{
+      const cls=e.type==='rent'?catColors[e.cat].rent:catColors[e.cat].ret;
+      const ic=e.type==='rent'?'▶':'◀';
+      return `<div class="cal-event ${cls}" onclick="openDayDetail('${dateStr}')" title="${e.customer} — ${e.dress}">${ic} ${e.dress}</div>`;
+    }).join('');
+    const more=dayEvs.length>3?`<div style="font-size:10px;color:var(--text-light);padding:1px 4px">+${dayEvs.length-3}</div>`:'';
+    html+=`<div class="cal-day${isToday?' cal-today':''}" onclick="dayEvs.length&&openDayDetail('${dateStr}')">
+      <div class="cal-day-num">${day}${dayEvs.length?`<span style="float:right;font-size:9px;background:var(--gold);color:white;border-radius:8px;padding:1px 5px">${dayEvs.length}</span>`:''}
+      </div>
+      ${evHTML}${more}
+    </div>`;
+  }
+  grid.innerHTML=html;
+
+  if(calView==='list') renderRentalList();
+}
+
+function openDayDetail(dateStr){
+  const catF=document.getElementById('calCatFilter').value;
+  const evs=[];
+  dresses.forEach(d=>{
+    if(catF && d.category!==catF) return;
+    d.rentals.forEach(r=>{
+      if(r.start===dateStr) evs.push({type:'Teslim',dress:d,rental:r});
+      if(r.end===dateStr)   evs.push({type:'İade', dress:d,rental:r});
+    });
+  });
+  if(!evs.length) return;
+  document.getElementById('dayModalTitle').textContent='📅 '+fmtDate(dateStr);
+  document.getElementById('dayModalBody').innerHTML=evs.map(ev=>`
+    <div style="border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:10px">
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
+        <span class="badge ${ev.type==='Teslim'?'badge-rented':'badge-available'}">${ev.type}</span>
+        <span class="badge cat-badge-${ev.dress.category}">${catIcon(ev.dress.category)} ${catLabel(ev.dress.category)}</span>
+        <strong style="font-size:14px">${ev.dress.name}</strong>
+        <span style="font-size:11px;color:var(--text-light)">${ev.dress.code}</span>
+      </div>
+      <div style="font-size:13px;margin-bottom:4px">👤 <strong>${ev.rental.customer}</strong></div>
+      <div style="font-size:12px;color:var(--text-light)">📞 ${ev.rental.phone}</div>
+      <div style="font-size:12px;color:var(--text-light);margin-top:4px">📅 ${fmtDate(ev.rental.start)} → ${fmtDate(ev.rental.end)}</div>
+      ${ev.rental.weddingDate?`<div style="font-size:12px;color:var(--text-light)">💒 Etkinlik: ${fmtDate(ev.rental.weddingDate)}</div>`:''}
+      ${ev.rental.deposit?`<div style="font-size:12px;color:var(--gold-dark);margin-top:4px">💰 Dep: ₺${fmt(ev.rental.deposit)}${ev.rental.balance?' · Kalan: ₺'+fmt(ev.rental.balance):''}</div>`:''}
+      ${ev.rental.notes?`<div style="font-size:12px;font-style:italic;color:var(--text-mid);margin-top:6px">${ev.rental.notes}</div>`:''}
+    </div>`).join('');
+  openModal('dayModal');
+}
+
+function renderRentalList(){
+  const catF=document.getElementById('calCatFilter').value;
+  const allRentals=[];
+  dresses.forEach(d=>{
+    if(catF && d.category!==catF) return;
+    d.rentals.forEach(r=>{
+      allRentals.push({dress:d,rental:r});
+    });
+  });
+  allRentals.sort((a,b)=>a.rental.start.localeCompare(b.rental.start));
+  const el=document.getElementById('rentalLogList');
+  if(!allRentals.length){
+    el.innerHTML=`<div class="empty-state"><div class="es-icon">📋</div><p>Kayıtlı kiralama bulunmuyor.</p></div>`;
+    return;
+  }
+  el.innerHTML=`<div style="font-size:13px;color:var(--text-light);margin-bottom:12px">${allRentals.length} kiralama kaydı</div>`
+    +allRentals.map(({dress:d,rental:r})=>{
+    const isActive=r.start<=today()&&r.end>=today();
+    const isPast=r.end<today();
+    return `<div class="rental-log-item">
+      <div class="rental-log-bar ${d.category[0]}"></div>
+      <div class="rental-log-main">
+        <div class="rental-log-top">
+          <span class="rental-log-name">${d.name}</span>
+          <span class="badge cat-badge-${d.category}" style="font-size:10px">${catIcon(d.category)} ${catLabel(d.category)}</span>
+          ${isActive?`<span class="badge badge-rented" style="font-size:10px">Aktif</span>`:isPast?`<span class="badge badge-sold" style="font-size:10px">Tamamlandı</span>`:`<span class="badge badge-warning" style="font-size:10px">Bekliyor</span>`}
+        </div>
+        <div class="rental-log-dates">📅 Teslim: ${fmtDate(r.start)} &nbsp;→&nbsp; İade: ${fmtDate(r.end)}${r.weddingDate?' &nbsp;💒 '+fmtDate(r.weddingDate):''}</div>
+        <div class="rental-log-customer">👤 ${r.customer} &nbsp;<span class="rental-log-phone">📞 ${r.phone}</span></div>
+        ${r.deposit?`<div style="font-size:12px;color:var(--gold-dark)">💰 Dep: ₺${fmt(r.deposit)}${r.balance?' · Kalan: ₺'+fmt(r.balance):''}</div>`:''}
+        ${r.notes?`<div class="rental-log-note">${r.notes}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function changeMonth(dir){
+  if(dir===0){ calendarDate=new Date(); }
+  else { calendarDate.setMonth(calendarDate.getMonth()+dir); }
+  renderCalendar();
+}
+
+// ── EDIT DRESS ──
+function openEditModal(id){
+  const d=dresses.find(x=>x.id===id); if(!d) return;
+  // populate fields
+  document.getElementById('editCategory').value=d.category;
+  document.getElementById('editName').value=d.name;
+  document.getElementById('editCode').value=d.code;
+  document.getElementById('editStyle').value=d.style||'';
+  document.getElementById('editSize').value=d.size||'';
+  document.getElementById('editRentPrice').value=d.rentPrice||'';
+  document.getElementById('editSalePrice').value=d.salePrice||'';
+  document.getElementById('editFabric').value=d.fabric||'';
+  document.getElementById('editStatus').value=d.status||'available';
+  document.getElementById('editNotes').value=d.notes||'';
+  // category tabs
+  ['gelinlik','nisanlik','kinalik'].forEach(c=>{
+    const tab=document.getElementById('editCatTab-'+c);
+    tab.className='cat-tab'+(c===d.category?' sel-'+c:'');
+  });
+  openModal('editDressModal');
+}
+
+function selectEditCategory(cat){
+  document.getElementById('editCategory').value=cat;
+  ['gelinlik','nisanlik','kinalik'].forEach(c=>{
+    const tab=document.getElementById('editCatTab-'+c);
+    tab.className='cat-tab'+(c===cat?' sel-'+c:'');
+  });
+}
+
+function saveEditDress(){
+  const id=currentDressId;
+  const d=dresses.find(x=>x.id===id); if(!d) return;
+  const name=document.getElementById('editName').value.trim();
+  const code=document.getElementById('editCode').value.trim();
+  if(!name||!code){ showToast('Ad ve kod zorunludur','error'); return; }
+  d.category=document.getElementById('editCategory').value;
+  d.name=name;
+  d.code=code;
+  d.style=document.getElementById('editStyle').value;
+  d.size=document.getElementById('editSize').value;
+  d.rentPrice=parseFloat(document.getElementById('editRentPrice').value)||0;
+  d.salePrice=parseFloat(document.getElementById('editSalePrice').value)||0;
+  d.fabric=document.getElementById('editFabric').value;
+  d.status=document.getElementById('editStatus').value;
+  d.notes=document.getElementById('editNotes').value;
+  saveData();
+  closeModal('editDressModal');
+  showToast(`${d.name} güncellendi ✨`,'success');
+  openDetail(id);
+}
+
+function confirmDeleteDress(){
+  const id=currentDressId;
+  const d=dresses.find(x=>x.id===id); if(!d) return;
+  if(!confirm(`"${d.name}" ürününü silmek istediğinizden emin misiniz?\nBu işlem geri alınamaz.`)) return;
+  dresses=dresses.filter(x=>x.id!==id);
+  saveData();
+  closeModal('editDressModal');
+  showToast(`${d.name} silindi`,'warning');
+  showPage('inventory',document.querySelectorAll('.nav-item')[1]);
+  renderInventory();
+}
+
+// ── INIT ──
+renderDashboard();
+</script>
+</body>
+</html>
